@@ -1,2 +1,2 @@
-# sybilXF
-R package for metabolic modeling of seahorse XF data integration
+# sybilxf
+R package for metabolic modeling of Seahorse extracellular flux (XF) data
