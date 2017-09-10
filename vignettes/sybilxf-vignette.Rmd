@@ -1,0 +1,81 @@
+---
+title: "sybilxf vignette"
+author: "Jonathan Dreyfuss"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+Welcome to the `sybilxf` package. This package integrates Seahorse XF Analyzer data into the human metabolic model to generate flux predictions across the metabolic map. The flow of the package is:
+
+1) Seahorse instrument: perform the actual measurements and return the data in a proprietary format.
+2) Seahorse WAVE software: parse the data, perform normalization, and output the summarized data based on the user-defined experimental design.
+3) Our software: perform metabolic modeling and make predictions.
+
+To load the package, use 
+```{r lib}
+library("sybilxf")
+```
+
+The `sybilxf` package begins with the summarized table of measurements returned by Seahorse's WAVE software. There is an example table for white adipocytes (WA) and brown adipocytes (BA) provided with the package. We worked on two immortalized cell lines (one white cell line and one brown cell line), so our table is summarized over technical replicates. You can load it it via:
+```{r load_data}
+data("seahorse_data")
+```
+
+The first few rows look like:
+```{r echo=FALSE, asis=TRUE}
+knitr::kable(head(seahorse_data, 6))
+```
+
+You also must load a metabolic model. We have included `Recon_21A_reduced`, which is the model subset to those reactions that are feasible under the Seahorse media. You can load it via:
+```{r load_model}
+data("Recon_21A_reduced")
+```
+
+Summarize the WAVE output and convert to flux balance analysis (FBA) units with:
+```{r summarize}
+seahorse_summarized <- summarize_seahorse(seahorse_data)
+seahorse_cu <- convert_units(seahorse_summarized)
+```
+
+The first few columns of `seahorse_cu` looks like:
+```{r echo=FALSE, asis=TRUE}
+knitr::kable(seahorse_cu[,1:8])
+```
+
+We sample from a normal distribution with the mean and standard deviation as that of the summarized Seahorse data for each of brown and white adipocytes. For speed, we only draw a few samples. 
+```{r sample}
+nsamples <- 5
+ba_sampled <- sample_seahorse(seahorse_cu, sample.nm = "BA", nsamples = nsamples)
+wa_sampled <- sample_seahorse(seahorse_cu, sample.nm = "WA", nsamples = nsamples)
+```
+
+For metabolic modeling, we need to map these fluxes to the metabolic map, which we do with:
+```{r map}
+ba_map <- map_seahorse(ba_sampled)
+wa_map <- map_seahorse(wa_sampled)
+```
+
+Now we can predict the fluxes for this brown and white adipocytes with these Seahorse measurements. This requires a linear programming solver interaface recognized by `sybil` such as `glpkAPI`, which requires installing the linear programming solver itself, such as `GLPK`.
+```{r flux_predict}
+ba_flux <- fluxPredict(Recon_21A_reduced, ba_map)
+wa_flux <- fluxPredict(Recon_21A_reduced, wa_map)
+```
+
+To compare the reactions statistically between tissues, we can use a t-test (or its nonparametric alternative) on each reaction to estimate p-values, and correct these using one of the `p.adjust` methods.
+```{r stat.tab}
+stat.tab <- data.frame(t(apply(cbind(wa_flux, ba_flux), MARGIN=1, FUN=function(x){
+  c(wa.avg=mean(x[1:nsamples]), ba.avg=mean(x[(nsamples+1):length(x)]), 
+  p=t.test(x[1:nsamples], x[(nsamples+1):length(x)])$p.value)
+})))
+stat.tab$fdr <- p.adjust(stat.tab$p, method="BY")
+stat.tab <- stat.tab[order(stat.tab$p),]
+```
+`stat.tab` should now have the most significantly different reactions between the two tissues at the top, and its top few rows look like:
+```{r}
+knitr::kable(head(stat.tab))
+```
+

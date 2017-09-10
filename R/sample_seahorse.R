@@ -2,14 +2,15 @@
 #'@title Sample from the seahorse data
 #'@author Alfred Ramirez
 #'@description This function takes the data.frame returned by the function \code{\link{summarize_seahorse}} and returns
-#'A data.frame with sampled measurements for the specified sample
+#'a data.frame with sampled measurements for the specified sample
 #'@param x A data.frame
-#'@param nsamples The number of samples to generate
 #'@param sample.nm The sample name 
+#'@param nsamples The number of samples to generate
 
-sample_seahorse <- function(x, nsamples=150, sample.nm=NULL){
-  if(is.null(sample.nm)|!(sample.nm %in% rownames(x))){
-    stop("Please specify sample. The sample must exist in the rownames of x")
+
+sample_seahorse <- function(x, sample.nm, nsamples=150){
+  if (!(sample.nm %in% rownames(x))){
+    stop(paste0("The sample.nm '", sample.nm, "' must be in the rownames of x"))
   }
   
   output_mat <- matrix(0, ncol=nsamples, nrow=8)
