@@ -1,4 +1,4 @@
----
+setwd---
 title: "sybilxf vignette"
 author: "Jonathan Dreyfuss"
 date: "`r Sys.Date()`"
@@ -46,8 +46,9 @@ The first few columns of `seahorse_cu` looks like:
 knitr::kable(seahorse_cu[,1:8])
 ```
 
-We sample from a normal distribution with the mean and standard deviation as that of the summarized Seahorse data for each of brown and white adipocytes. For speed, we only draw a few samples. 
+We sample from a normal distribution with the mean and standard deviation as that of the summarized Seahorse data for each of brown and white adipocytes. For speed, we only draw a few samples. For reproducibility, we also set the seed.
 ```{r sample}
+set.seed(0)
 nsamples <- 5
 ba_sampled <- sample_seahorse(seahorse_cu, sample.nm = "BA", nsamples = nsamples)
 wa_sampled <- sample_seahorse(seahorse_cu, sample.nm = "WA", nsamples = nsamples)
@@ -59,23 +60,33 @@ ba_map <- map_seahorse(ba_sampled)
 wa_map <- map_seahorse(wa_sampled)
 ```
 
-Now we can predict the fluxes for this brown and white adipocytes with these Seahorse measurements. This requires a linear programming solver interaface recognized by `sybil` such as `glpkAPI`, which requires installing the linear programming solver itself, such as `GLPK`.
-```{r flux_predict}
+Now we can predict the fluxes for this brown and white adipocytes with these Seahorse measurements. This requires a linear programming solver interface package recognized by `sybil`, such as `glpkAPI`, which requires installing the linear programming solver itself, such as `GLPK`. This can be sped up by registering a parallel backend with, for example:
+```{r reg, eval=FALSE}
+library("doParallel")
+cl <- makeCluster()
+registerDoParallel(cl)
+```
+If we started a parallel backend we must stop it. The fluxes can be optimized using `fluxPredict`. This step can take quite a long time, depending on your optimizer and parallelization
+```{r flux_predict, eval=FALSE}
+library("glpkAPI")
 ba_flux <- fluxPredict(Recon_21A_reduced, ba_map)
 wa_flux <- fluxPredict(Recon_21A_reduced, wa_map)
+ad_flux_mat <- cbind(wa_flux, ba_flux)
+colnames(ad_flux_mat) <- paste0(rep(c("wa", "ba"), each=nsamples), rep(1:nsamples, times=2))
+stopImplicitCluster()
 ```
 
-To compare the reactions statistically between tissues, we can use a t-test (or its nonparametric alternative) on each reaction to estimate p-values, and correct these using one of the `p.adjust` methods.
+To compare the reactions statistically between tissues, we can use a t-test, or its nonparametric alternative, on each reaction to estimate p-values, and correct these using one of the `p.adjust` methods.
 ```{r stat.tab}
-stat.tab <- data.frame(t(apply(cbind(wa_flux, ba_flux), MARGIN=1, FUN=function(x){
+data("ad_flux_mat")
+stat.tab <- data.frame(t(apply(ad_flux_mat, MARGIN=1, FUN=function(x){
   c(wa.avg=mean(x[1:nsamples]), ba.avg=mean(x[(nsamples+1):length(x)]), 
-  p=t.test(x[1:nsamples], x[(nsamples+1):length(x)])$p.value)
+  p=suppressWarnings(wilcox.test(x[1:nsamples], x[(nsamples+1):length(x)])$p.value))
 })))
-stat.tab$fdr <- p.adjust(stat.tab$p, method="BY")
+stat.tab$fdr <- p.adjust(stat.tab$p, method="BH")
 stat.tab <- stat.tab[order(stat.tab$p),]
 ```
 `stat.tab` should now have the most significantly different reactions between the two tissues at the top, and its top few rows look like:
 ```{r}
 knitr::kable(head(stat.tab))
 ```
-
