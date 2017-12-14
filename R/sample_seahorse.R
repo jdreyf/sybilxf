@@ -1,4 +1,3 @@
-#'@export sample_seahorse
 #'@title Sample from the seahorse data
 #'@author Alfred Ramirez
 #'@description This function takes the data.frame returned by the function \code{\link{summarize_seahorse}} and returns
@@ -6,7 +5,7 @@
 #'@param x A data.frame
 #'@param sample.nm The sample name 
 #'@param nsamples The number of samples to generate
-
+#'@export
 
 sample_seahorse <- function(x, sample.nm, nsamples=150){
   if (!(sample.nm %in% rownames(x))){
