@@ -87,6 +87,6 @@ stat.tab$fdr <- p.adjust(stat.tab$p, method="BH")
 stat.tab <- stat.tab[order(stat.tab$p),]
 ```
 `stat.tab` should now have the most significantly different reactions between the two tissues at the top, and its top few rows look like:
-```{r}
+```{r echo=FALSE}
 knitr::kable(head(stat.tab))
 ```

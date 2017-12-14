@@ -292,7 +292,6 @@ stat.tab &lt;- data.frame(t(apply(ad_flux_mat, MARGIN=1, FUN=function(x){
 stat.tab$fdr &lt;- p.adjust(stat.tab$p, method=&quot;BH&quot;)
 stat.tab &lt;- stat.tab[order(stat.tab$p),]</code></pre>
 <p><code>stat.tab</code> should now have the most significantly different reactions between the two tissues at the top, and its top few rows look like:</p>
-<pre class="r"><code>knitr::kable(head(stat.tab))</code></pre>
 <table>
 <thead>
 <tr class="header">
