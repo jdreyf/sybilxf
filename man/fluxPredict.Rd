@@ -5,7 +5,7 @@
 \title{Make predictions from seahorse data by sampling and minimizing total flux}
 \usage{
 fluxPredict(model, seahorse_data, biomass_est = 0, alg = c("fba", "mtf"),
-  obj_rxn = NULL)
+  obj_rxn = NULL, model.nm = c("2.1A", "2.1x", "2.2"))
 }
 \arguments{
 \item{model}{An object of class \code{\link[sybil]{modelorg}}}
@@ -17,6 +17,8 @@ fluxPredict(model, seahorse_data, biomass_est = 0, alg = c("fba", "mtf"),
 \item{alg}{Either "fba" (default) to optimize a reaction or "mtf" to only minimize total flux (and not do fba).}
 
 \item{obj_rxn}{Reaction in \code{model} to optimize if \code{alg="fba"}. Default \code{NULL} optimizes ATP demand reaction.}
+
+\item{model.nm}{The metabolic model name. One of "2.1A", "2.1x", or "2.2".}
 }
 \description{
 This function integrates the sampled seahorse measurements as constraints into the specified model, 

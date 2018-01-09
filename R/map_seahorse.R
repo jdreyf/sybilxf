@@ -13,13 +13,13 @@ map_seahorse <- function(x, model.nm=c("2.1A", "2.1x", "2.2")){
   # These reaction names are specific to Recon 2.1A & Recon 2.1x.
   if (model.nm %in% c("2.1A", "2.1x")){
     exp_coefs <- c(o2_in="EX_o2(e)in", o2_out="EX_o2(e)ex", atp_synth="ATPS4m", atp_demand="DM_atp_m_", 
-                   o2_trans_mit="O2tm", lac_in="EX_lac_L(e)in", lac_out="EX_lac_L(e)ex")
+                   o2_trans_mit="O2tm", h_in="EX_h(e)in", h_out="EX_h(e)ex")
     #model is reversible
     model.is.rev <- FALSE
   }
   if (model.nm=="2.2"){
     exp_coefs <- c(o2_ex="EX_o2(e)", atp_synth="ATPS4m", atp_demand="DM_atp_c_", 
-                   o2_trans_mit="O2tm", lac_ex="EX_lac_L(e)")
+                   o2_trans_mit="O2tm", h_ex="EX_h(e)")
     model.is.rev <- TRUE
   }
   
@@ -58,21 +58,21 @@ map_seahorse <- function(x, model.nm=c("2.1A", "2.1x", "2.2")){
   #Ideally, there should never be a case where the PPR is negative (except a few edges cases in biology).
   if (model.is.rev){
     for(i in 1:ncol(x)){
-      output_mat[lb["lac_ex"],i] <- x["PPR_basal",i]
-      output_mat[ub["lac_ex"],i] <- x["PPR_basal",i]
+      output_mat[lb["h_ex"],i] <- x["PPR_basal",i]
+      output_mat[ub["h_ex"],i] <- x["PPR_basal",i]
     }
   } else {
     for(i in 1:ncol(x)){
       if(x["PPR_basal",i] < 0){
-        output_mat[lb["lac_in"],i] <- abs(x["PPR_basal",i])
-        output_mat[ub["lac_in"],i] <- abs(x["PPR_basal",i])
-        output_mat[lb["lac_out"],i] <- 0
-        output_mat[ub["lac_out"],i] <- 0
+        output_mat[lb["h_in"],i] <- abs(x["PPR_basal",i])
+        output_mat[ub["h_in"],i] <- abs(x["PPR_basal",i])
+        output_mat[lb["h_out"],i] <- 0
+        output_mat[ub["h_out"],i] <- 0
       } else {
-        output_mat[lb["lac_in"],i] <- 0
-        output_mat[ub["lac_in"],i] <- 0
-        output_mat[lb["lac_out"],i] <- x["PPR_basal",i]
-        output_mat[ub["lac_out"],i] <- x["PPR_basal",i]
+        output_mat[lb["h_in"],i] <- 0
+        output_mat[ub["h_in"],i] <- 0
+        output_mat[lb["h_out"],i] <- x["PPR_basal",i]
+        output_mat[ub["h_out"],i] <- x["PPR_basal",i]
       }
     }
   }#end else model not reversible
