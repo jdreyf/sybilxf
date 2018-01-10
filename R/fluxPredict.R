@@ -42,7 +42,7 @@ fluxPredict <-function(model, seahorse_data, biomass_est=0, alg=c("fba", "mtf"),
   
   #create wts to nudge to co2 + lactate efflux
   if (alg=="mtf"){
-    wts <- rep(-1, times=length(model@react_id))
+    wts <- rep(1, times=length(model@react_id))
     names(wts) <- model@react_id
     #found rxns initially in vmh
     #then found rxns in 2.1A by using grep w/ fixed=TRUE
@@ -56,16 +56,17 @@ fluxPredict <-function(model, seahorse_data, biomass_est=0, alg=c("fba", "mtf"),
     }
     low.wt.rxns <- c(lac.rxns, co2.rxns)
     stopifnot(low.wt.rxns %in% model@react_id)
-    wts[low.wt.rxns] <- -0.01
+    wts[low.wt.rxns] <- 0.01
   }#end create wts
   
   final_output <- foreach(i=1:ncol(seahorse_data), .combine=cbind) %dopar% {
     model_lb <- c(seahorse_data[grep("_lb$", rownames(seahorse_data)),i], biomass_est)
     model_ub <- c(seahorse_data[grep("_ub$", rownames(seahorse_data)),i], biomass_est)
+    stopifnot(exp_coefs %in% model@react_id)
     model <- sybil::changeBounds(model, react=exp_coefs, lb=model_lb, ub=model_ub)
-    if (alg=="fba") model <- sybil::changeObjFunc(model, obj_rxn, obj_coef=1)
     
     if (alg=="fba"){
+      model <- sybil::changeObjFunc(model, obj_rxn, obj_coef=1)
       model_test_flux <- sybil::optimizeProb(model, algorithm="fba", lpdir="max")  
       lpsolution <- model_test_flux@lp_stat 
       #If the constraints are not feasible, we return a column of NAs for those constraints
@@ -80,8 +81,23 @@ fluxPredict <-function(model, seahorse_data, biomass_est=0, alg=c("fba", "mtf"),
       #if not fba, then min weighted flux
       # output_fluxes <- sybil::optimizeProb(model, alg="mtf")
       #min weighted flux to nudge to co2 + lactate efflux
-      output_fluxes <- sybil::optimizeProb(model, alg="fba", react=1:length(wts), obj_coef=wts)
-      output <- sybil::getFluxDist(output_fluxes)
+      #output_fluxes <- sybil::optimizeProb(model, alg="fba", react=1:length(wts), obj_coef=wts)
+      #output <- sybil::getFluxDist(output_fluxes)
+      nrxns <- model@react_num
+      nmets <- model@met_num
+      eye <- simple_triplet_diag_matrix(v=rep(1, times=nrxns))
+      neg.eye <- simple_triplet_diag_matrix(v=rep(-1, times=nrxns))
+      mat1 <- abind_simple_sparse_array(as.simple_triplet_matrix(model@S), simple_triplet_zero_matrix(nrow = nmets, ncol=nrxns), MARGIN = 2)
+      mat2 <- abind_simple_sparse_array(eye, neg.eye, MARGIN = 2)
+      mat3 <- abind_simple_sparse_array(neg.eye, neg.eye, MARGIN = 2)                           
+      mat <- abind_simple_sparse_array(mat1, mat2, mat3, MARGIN=1)
+      
+      obj <- c(numeric(nrxns), wts)
+      dirs <- rep(c("==", "<="), times=c(nmets, 2*nrxns))
+      lb <- list(ind = 1:nrxns, val = model@lowbnd)
+      ub <- list(ind =1:nrxns, val = model@uppbnd)
+      opt <- Rglpk_solve_LP(obj=obj, mat=mat, dir=dirs, rhs=numeric(nmets+2*nrxns), bounds=list(lower=lb, upper=ub), verbose=TRUE)
+      output <- opt$solution[1:nrxns]
     }
   }#end foreach
   rownames(final_output) <- sybil::react_id(model)

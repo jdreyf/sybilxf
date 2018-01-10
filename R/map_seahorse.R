@@ -14,13 +14,10 @@ map_seahorse <- function(x, model.nm=c("2.1A", "2.1x", "2.2")){
   if (model.nm %in% c("2.1A", "2.1x")){
     exp_coefs <- c(o2_in="EX_o2(e)in", o2_out="EX_o2(e)ex", atp_synth="ATPS4m", atp_demand="DM_atp_m_", 
                    o2_trans_mit="O2tm", h_in="EX_h(e)in", h_out="EX_h(e)ex")
-    #model is reversible
-    model.is.rev <- FALSE
   }
   if (model.nm=="2.2"){
     exp_coefs <- c(o2_ex="EX_o2(e)", atp_synth="ATPS4m", atp_demand="DM_atp_c_", 
                    o2_trans_mit="O2tm", h_ex="EX_h(e)")
-    model.is.rev <- TRUE
   }
   
   ub <- setNames(paste0(exp_coefs,"_ub"), nm=names(exp_coefs))
@@ -31,7 +28,7 @@ map_seahorse <- function(x, model.nm=c("2.1A", "2.1x", "2.2")){
   rownames(output_mat) <- c(ub, lb)
   
   #set some fluxes to a value by setting both their upper and lower bounds to that value
-  if (model.is.rev){
+  if (model.nm=="2.2"){
     output_mat[lb["o2_ex"],] <- -1*x["OCR_basal",]
     output_mat[ub["o2_ex"],] <- -1*x["OCR_basal",]
   } else {
@@ -56,7 +53,7 @@ map_seahorse <- function(x, model.nm=c("2.1A", "2.1x", "2.2")){
   #Lactate and extracellular acid may be negative and the associated reactions have different 
   #stoichiometries due to the total carbon constraint, thus an if statement is needed to check to determine which one to set.
   #Ideally, there should never be a case where the PPR is negative (except a few edges cases in biology).
-  if (model.is.rev){
+  if (model.nm=="2.2"){
     for(i in 1:ncol(x)){
       output_mat[lb["h_ex"],i] <- x["PPR_basal",i]
       output_mat[ub["h_ex"],i] <- x["PPR_basal",i]
