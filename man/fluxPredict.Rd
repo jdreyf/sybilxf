@@ -4,8 +4,8 @@
 \alias{fluxPredict}
 \title{Make predictions from seahorse data by sampling and minimizing total flux}
 \usage{
-fluxPredict(model, seahorse_data, biomass_est = 0, alg = c("fba", "mtf"),
-  obj_rxn = NULL, model.nm)
+fluxPredict(model, seahorse_data, biomass_est = 0, alg = c("mtf", "fba"),
+  obj_rxn = NULL, model.nm = "2.2", solver = c("gurobi", "glpk"))
 }
 \arguments{
 \item{model}{An object of class \code{\link[sybil]{modelorg}}}
@@ -18,7 +18,9 @@ fluxPredict(model, seahorse_data, biomass_est = 0, alg = c("fba", "mtf"),
 
 \item{obj_rxn}{Reaction in \code{model} to optimize if \code{alg="fba"}. Default \code{NULL} optimizes ATP demand reaction.}
 
-\item{model.nm}{The metabolic model name. One of "2.1A", "2.1x", or "2.2".}
+\item{model.nm}{The metabolic model name. One of "2.1A", "2.1x", or "2.2" (default).}
+
+\item{solver}{The solver to use; "gurobi" (default) or "glpk".}
 }
 \description{
 This function integrates the sampled seahorse measurements as constraints into the specified model, 

@@ -1,13 +1,16 @@
 Package: sybilxf
 Type: Package
 Title: R package for integration of Seahorse extracellular flux (XF) data with metabolic modeling.
-Version: 0.0.2.9001
+Version: 0.0.2.9002
 Date: 2017-02-28
 Author: Alfred Ramirez, Jonathan Dreyfuss
 Description: This package integrates the OCR and PPR measurements produced by Seahorse's mito stress test and performs metabolic modeling with R package sybil to generate flux predictions.
 License: MIT
-Imports: foreach (>= 1.4.3), sybil (>= 2.0.0)
+Imports: foreach (>= 1.4.3), slam, sybil (>= 2.0.0)
 RoxygenNote: 6.0.1
-Suggests: knitr,
-    rmarkdown
+Suggests: 
+	gurobi,
+	knitr,
+	Rglpk,
+    rmarkdown,
 VignetteBuilder: knitr

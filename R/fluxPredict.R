@@ -8,15 +8,17 @@
 #'@param biomass_est Estimated biomass flux. Default = 0.
 #'@param alg Either "fba" (default) to optimize a reaction or "mtf" to only minimize total flux (and not do fba).
 #'@param obj_rxn Reaction in \code{model} to optimize if \code{alg="fba"}. Default \code{NULL} optimizes ATP demand reaction.
-#'@param model.nm The metabolic model name. One of "2.1A", "2.1x", or "2.2".
+#'@param model.nm The metabolic model name. One of "2.1A", "2.1x", or "2.2" (default).
+#'@param solver The solver to use; "gurobi" (default) or "glpk".
 #'@details For parallel computing, a parallel backend must be registered. See \code{\link[foreach]{foreach}} for details.
 #'@export
 
-fluxPredict <-function(model, seahorse_data, biomass_est=0, alg=c("fba", "mtf"), 
-                       obj_rxn=NULL, model.nm, solver=c("gurobi", "glpk")){
+fluxPredict <-function(model, seahorse_data, biomass_est=0, alg=c("mtf", "fba"), low.wt.rxns=NULL,
+                       obj_rxn=NULL, model.nm="2.1A", solver=c("gurobi", "glpk")){
   alg <- match.arg(alg)
   solver <- match.arg(solver)
   stopifnot(model.nm %in% c("2.1A", "2.1x", "2.2"))
+  stopifnot(is.null(low.wt.rxns)|low.wt.rxns %in% model@react_id)
   if (alg=="fba" && !is.null(obj_rxn) && !(obj_rxn %in% sybil::react_id(model))){
     stop("obj_rxn ", obj_rxn, " not in react_id(model).")
   }
@@ -53,14 +55,17 @@ fluxPredict <-function(model, seahorse_data, biomass_est=0, alg=c("fba", "mtf"),
       co2.rxns <- c("CO2t", "CO2tm", "EX_hco3(e)", "H2CO3D", "H2CO3Dm", "r0941", "r1418")
       model <- sybil::changeBounds(model, react=c("H2CO3D", "H2CO3Dm", "EX_lac_L(e)", "EX_hco3(e)"), lb=0)
       model <- sybil::changeBounds(model, react=c("L_LACt2r", "LDH_L"), ub=0)
-      #no co2 ex
-      model <- sybil::changeBounds(model, react="EX_co2(e)", lb=0, ub=0)
-      
+      #no co2 ex in Seahorse well
+      #LACDcm -> 2 H+ & no evidence it exists in humans
+      model <- sybil::changeBounds(model, react=c("EX_co2(e)", "L_LACDcm"), lb=0, ub=0)
     } else if (model.nm %in% c("2.1A", "2.1x")){
       lac.rxns <- c("L_LACt2r", "EX_lac_L(e)ex", "LDH_L")
       co2.rxns <- c("CO2t", "CO2tm", "EX_hco3(e)ex", "H2CO3D", "r0941", "r1418")
+      model <- sybil::changeBounds(model, react=c("H2CO3D"), lb=0)
+      model <- sybil::changeBounds(model, react=c("L_LACt2r", "LDH_L", "EX_lac_L(e)in", "EX_hco3(e)in"), ub=0)
+      model <- sybil::changeBounds(model, react=c("EX_co2(e)in", "EX_co2(e)ex"), lb=0, ub=0)
     }
-    low.wt.rxns <- c(lac.rxns, co2.rxns)
+    low.wt.rxns <- c(lac.rxns, co2.rxns, low.wt.rxns)
     stopifnot(low.wt.rxns %in% model@react_id)
     wts[low.wt.rxns] <- 0.01
   }#end create wts
@@ -105,16 +110,21 @@ fluxPredict <-function(model, seahorse_data, biomass_est=0, alg=c("fba", "mtf"),
         lb <- list(ind = 1:nrxns, val = model@lowbnd)
         ub <- list(ind = 1:nrxns, val = model@uppbnd)
         opt <- Rglpk::Rglpk_solve_LP(obj=obj, mat=mat, dir=dirs, rhs=rhs, bounds=list(lower=lb, upper=ub))
-        if (opt$status==0) print("OPTIMAL SOLUTION FOUND")
+        if (opt$status==0) cat("OPTIMAL SOLUTION FOUND\n")
         output <- opt$solution[1:nrxns]
       } else if (solver=="gurobi"){
         sense <- sub("==", "=", dirs)
         lb <- c(model@lowbnd, numeric(nrxns))
         ub <- c(model@uppbnd, rep(1000, nrxns))
         mod <- list(obj=obj, A=mat, rhs=rhs, sense=sense, lb=lb, ub=ub)
-        opt <- gurobi::gurobi(model=mod)
-        if (opt$status=="OPTIMAL") print("OPTIMAL SOLUTION FOUND")
-        output <- opt$x[1:nrxns]
+        #params: http://www.gurobi.com/documentation/7.5/refman/parameters.html
+        opt <- gurobi::gurobi(model=mod, params = list(OutputFlag=0))
+        if (opt$status=="OPTIMAL"){
+          cat("OPTIMAL SOLUTION FOUND\n")
+          output <- opt$x[1:nrxns]
+        } else {
+          output <- rep(NA, times=nrxns)
+        }
       }
     }
   }#end foreach

@@ -4,7 +4,7 @@
 \alias{sample_seahorse}
 \title{Sample from the seahorse data}
 \usage{
-sample_seahorse(x, sample.nm, nsamples = 150)
+sample_seahorse(x, sample.nm, nsamples = 150, nrep = 3)
 }
 \arguments{
 \item{x}{A data.frame}
@@ -12,11 +12,13 @@ sample_seahorse(x, sample.nm, nsamples = 150)
 \item{sample.nm}{The sample name}
 
 \item{nsamples}{The number of samples to generate}
+
+\item{nrep}{The number of replicates, used to calculate standard error}
 }
 \description{
-This function takes the data.frame returned by the function \code{\link{summarize_seahorse}} and returns
-a data.frame with sampled measurements for the specified sample
+This function takes the data frame returned by the function \code{\link{summarize_seahorse}} and returns
+a data frame with sampled measurements for the specified sample
 }
 \author{
-Alfred Ramirez
+Alfred Ramirez, Jonathan Dreyfuss
 }
