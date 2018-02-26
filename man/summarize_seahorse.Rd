@@ -4,19 +4,20 @@
 \alias{summarize_seahorse}
 \title{Summarize seahorse data by sample and region}
 \usage{
-summarize_seahorse(x, n = 4)
+summarize_seahorse(x, injections = c("basal", "oligomycin", "fccp",
+  "rotenone"))
 }
 \arguments{
 \item{x}{A data.frame}
 
-\item{n}{The number of regions}
+\item{injections}{The names of the injections}
 }
 \description{
 This function takes the long format table exported by the XF Wave software for the 
-oxidiative stress test and returns a matrix of means and standard deviations for each region
-of the assay (namely basal, oligomycin, fccp, and rotenone).  The GroupName column must have the sample names.
+Mitochondrial stress test and returns a matrix of means and standard deviations for each region
+of the assay (e.g. basal, oligomycin, fccp, and rotenone).  The GroupName column must have the sample names.
 The final measurement of each region is used for the mean and standard deviation across wells.
 }
 \author{
-Alfred Ramirez
+Alfred Ramirez, Jonathan Dreyfuss
 }

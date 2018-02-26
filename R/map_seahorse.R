@@ -37,15 +37,16 @@ map_seahorse <- function(x, model.nm=c("2.1A", "2.1x", "2.2")){
     output_mat[lb["o2_out"],] <- 0
     output_mat[ub["o2_out"],] <- 0
   }
-  output_mat[lb["atp_synth"],] <- 4.6*(x["OCR_basal",] - x["OCR_oligo",])
-  output_mat[ub["atp_synth"],] <- 4.6*(x["OCR_basal",] - x["OCR_oligo",])
-  output_mat[lb["atp_demand"],] <- 4.6*(x["OCR_oligo",] - x["OCR_rotenone",])
-  output_mat[ub["atp_demand"],] <- 4.6*(x["OCR_oligo",] - x["OCR_rotenone",])
+  output_mat[lb["atp_synth"],] <- 4.6*(x["OCR_basal",] - x["OCR_oligomycin",])
+  output_mat[ub["atp_synth"],] <- 4.6*(x["OCR_basal",] - x["OCR_oligomycin",])
+  output_mat[lb["atp_demand"],] <- 4.6*(x["OCR_oligomycin",] - x["OCR_rotenone",])
+  output_mat[ub["atp_demand"],] <- 4.6*(x["OCR_oligomycin",] - x["OCR_rotenone",])
   output_mat[lb["o2_trans_mit"],] <- x["OCR_basal",] - x["OCR_rotenone",]
   output_mat[ub["o2_trans_mit"],] <- x["OCR_fccp",] - x["OCR_rotenone",]
+  
   if (any(output_mat[ub["o2_trans_mit"],] < output_mat[lb["o2_trans_mit"],])){
-    warning("Some OCR_fccp sampled fluxes were less than OCR_basal sampled fluxes. To avoid infeasibility, 
-            these were set to the OCR_basal values.")
+    warning(strwrap(x="Some OCR_fccp sampled fluxes were < OCR_basal sampled fluxes. To avoid infeasibility, 
+                    these were set to OCR_basal values."))
     wh.cols <- which(output_mat[ub["o2_trans_mit"],] < output_mat[lb["o2_trans_mit"],])
     output_mat[ub["o2_trans_mit"], wh.cols] <- output_mat[lb["o2_trans_mit"], wh.cols]
   }

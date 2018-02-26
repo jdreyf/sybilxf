@@ -5,7 +5,8 @@
 \title{Make predictions from seahorse data by sampling and minimizing total flux}
 \usage{
 fluxPredict(model, seahorse_data, biomass_est = 0, alg = c("mtf", "fba"),
-  obj_rxn = NULL, model.nm = "2.2", solver = c("gurobi", "glpk"))
+  low.wt.rxns = NULL, obj_rxn = NULL, model.nm = "2.1A",
+  solver = c("gurobi", "glpk"))
 }
 \arguments{
 \item{model}{An object of class \code{\link[sybil]{modelorg}}}

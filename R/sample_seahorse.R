@@ -13,20 +13,21 @@ sample_seahorse <- function(x, sample.nm, nsamples=150, nrep=3){
     stop(paste0("The sample.nm '", sample.nm, "' must be in the rownames of x"))
   }
   
-  output_mat <- matrix(0, ncol=nsamples, nrow=8)
+  injections <- sub("^OCR_sd_", "", grep("^OCR_sd", colnames(x), value=TRUE))
+  n.inj <- length(injections)
+  message("Injections inferred from colnames(x) are: ", paste(injections, collapse=", "))
+  
+  output_mat <- matrix(0, ncol=nsamples, nrow=n.inj*2)
   colnames(output_mat) <- paste0("sample", 1:nsamples)
-  rownames(output_mat) <- c("OCR_basal", "OCR_oligo", "OCR_fccp", "OCR_rotenone", "PPR_basal", "PPR_oligo", "PPR_fccp", "PPR_rotenone")
+  #rownames(output_mat) <- c("OCR_basal", "OCR_oligo", "OCR_fccp", "OCR_rotenone", "PPR_basal", "PPR_oligo", "PPR_fccp", "PPR_rotenone")
+  rownames(output_mat) <- paste(rep(c("OCR", "PPR"), each=n.inj), injections, sep="_")
   
-  i <- sample.nm
-  output_mat["OCR_basal",] <- rnorm(nsamples, mean=x[i,"OCR_basal"], sd=x[i,"OCR_sd_basal"]/sqrt(nrep))
-  output_mat["OCR_oligo",] <- rnorm(nsamples, mean=x[i,"OCR_oligo"], sd=x[i,"OCR_sd_oligo"]/sqrt(nrep))
-  output_mat["OCR_fccp",] <- rnorm(nsamples, mean=x[i,"OCR_fccp"], sd=x[i,"OCR_sd_fccp"]/sqrt(nrep))
-  output_mat["OCR_rotenone",] <- rnorm(nsamples, mean=x[i,"OCR_rotenone"], sd=x[i,"OCR_sd_rotenone"]/sqrt(nrep))
-  
-  output_mat["PPR_basal",] <- rnorm(nsamples, mean=x[i,"PPR_basal"], sd=x[i,"PPR_sd_basal"]/sqrt(nrep))
-  output_mat["PPR_oligo",] <- rnorm(nsamples, mean=x[i,"PPR_oligo"], sd=x[i,"PPR_sd_oligo"]/sqrt(nrep))
-  output_mat["PPR_fccp",] <- rnorm(nsamples, mean=x[i,"PPR_fccp"], sd=x[i,"PPR_sd_fccp"]/sqrt(nrep))
-  output_mat["PPR_rotenone",] <- rnorm(nsamples, mean=x[i,"PPR_rotenone"], sd=x[i,"PPR_sd_rotenone"]/sqrt(nrep))
+  for (inj.nm in injections){
+    output_mat[paste0("OCR_", inj.nm),] <- rnorm(nsamples, mean=x[sample.nm, paste0("OCR_", inj.nm)], 
+                                                sd=x[sample.nm, paste0("OCR_sd_", inj.nm)]/sqrt(nrep))
+    output_mat[paste0("PPR_", inj.nm),] <- rnorm(nsamples, mean=x[sample.nm, paste0("PPR_", inj.nm)], 
+                                                sd=x[sample.nm, paste0("PPR_sd_", inj.nm)]/sqrt(nrep))
+  }
   
   output_mat
 }
