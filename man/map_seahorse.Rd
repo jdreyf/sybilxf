@@ -17,6 +17,11 @@ and maps the fluxes to metabolic reactions. It returns a matrix with the mapped 
 basal oxygen consumption, mitochondrial oxygen consumption, mitochondrial ATP production,
 mitochondrial ATP leak, and basal extracellular acidification
 }
+\references{
+Ramirez AK, Lynes MD, Shamsi F, Xue R, Tseng YH, Kahn CR, Kasif S, Dreyfuss JM. Integrating Extracellular 
+Flux Measurements and Genome-Scale Modeling Reveals Differences between Brown and White Adipocytes. Cell Rep 2017 
+Dec; 21(11): 3040-3048.
+}
 \author{
 Alfred Ramirez, Jonathan Dreyfuss
 }

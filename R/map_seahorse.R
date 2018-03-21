@@ -1,12 +1,15 @@
-#'@title Map the seahorse fluxes to metabolic reactions
-#'@author Alfred Ramirez, Jonathan Dreyfuss
-#'@description This function takes the matrix of sampled seahorse measurements returned by \code{\link{sample_seahorse}}
-#'and maps the fluxes to metabolic reactions. It returns a matrix with the mapped fluxes of
-#'basal oxygen consumption, mitochondrial oxygen consumption, mitochondrial ATP production,
-#'mitochondrial ATP leak, and basal extracellular acidification
-#'@param x A matrix of sampled seahorse measurements
-#'@param model.nm The metabolic model name. One of "2.1A", "2.1x", or "2.2".
-#'@export
+#' @title Map the seahorse fluxes to metabolic reactions
+#' @author Alfred Ramirez, Jonathan Dreyfuss
+#' @description This function takes the matrix of sampled seahorse measurements returned by \code{\link{sample_seahorse}}
+#' and maps the fluxes to metabolic reactions. It returns a matrix with the mapped fluxes of
+#' basal oxygen consumption, mitochondrial oxygen consumption, mitochondrial ATP production,
+#' mitochondrial ATP leak, and basal extracellular acidification
+#' @param x A matrix of sampled seahorse measurements
+#' @param model.nm The metabolic model name. One of "2.1A", "2.1x", or "2.2".
+#' @references Ramirez AK, Lynes MD, Shamsi F, Xue R, Tseng YH, Kahn CR, Kasif S, Dreyfuss JM. Integrating Extracellular 
+#'Flux Measurements and Genome-Scale Modeling Reveals Differences between Brown and White Adipocytes. Cell Rep 2017 
+#'Dec; 21(11): 3040-3048.
+#' @export
 
 map_seahorse <- function(x, model.nm=c("2.1A", "2.1x", "2.2")){
   stopifnot(model.nm %in% c("2.1A", "2.1x", "2.2"))

@@ -1,12 +1,16 @@
-#'@export summarize_seahorse
-#'@title Summarize seahorse data by sample and region
-#'@author Alfred Ramirez, Jonathan Dreyfuss
-#'@description This function takes the long format table exported by the XF Wave software for the 
-#'Mitochondrial stress test and returns a matrix of means and standard deviations for each region
-#'of the assay (e.g. basal, oligomycin, fccp, and rotenone).  The GroupName column must have the sample names.
-#'The final measurement of each region is used for the mean and standard deviation across wells.
-#'@param x A data.frame
-#'@param injections The names of the injections
+#' @title Summarize seahorse data by sample and region
+#' @author Alfred Ramirez, Jonathan Dreyfuss
+#' @description This function takes the long format table exported by the XF Wave software for the 
+#' Mitochondrial stress test and returns a matrix of means and standard deviations for each region
+#' of the assay (e.g. basal, oligomycin, fccp, and rotenone).  The GroupName column must have the sample names.
+#' The final measurement of each region is used for the mean and standard deviation across wells.
+#' @param x A data.frame
+#' @param injections The names of the injections
+#' @references Ramirez AK, Lynes MD, Shamsi F, Xue R, Tseng YH, Kahn CR, Kasif S, Dreyfuss JM. Integrating Extracellular 
+#' Flux Measurements and Genome-Scale Modeling Reveals Differences between Brown and White Adipocytes. Cell Rep 2017 
+#' Dec; 21(11): 3040-3048.
+#' @export
+
 
 summarize_seahorse <- function(x, injections=c("basal", "oligomycin", "fccp", "rotenone")){
   n <- length(injections)

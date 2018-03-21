@@ -1,4 +1,4 @@
-setwd---
+---
 title: "sybilxf vignette"
 author: "Jonathan Dreyfuss"
 date: "`r Sys.Date()`"
@@ -9,7 +9,11 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-Welcome to the `sybilxf` package. This package integrates Seahorse XF Analyzer data into the human metabolic model to generate flux predictions across the metabolic map. The flow of the package is:
+Welcome to the `sybilxf` package. This package integrates Seahorse XF Analyzer data into the human metabolic model to generate flux predictions across the metabolic map. The method is described in: 
+
+Ramirez AK, Lynes MD, Shamsi F, Xue R, Tseng YH, Kahn CR, Kasif S, Dreyfuss JM. **Integrating Extracellular Flux Measurements and Genome-Scale Modeling Reveals Differences between Brown and White Adipocytes.** *Cell Rep* 2017 Dec; 21(11): 3040-3048. 
+
+Please cite this paper if you use the package. The package flow is:
 
 1) Seahorse instrument: perform the actual measurements and return the data in a proprietary format.
 2) Seahorse WAVE software: parse the data, perform normalization, and output the summarized data based on the user-defined experimental design.

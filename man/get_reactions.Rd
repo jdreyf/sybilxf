@@ -7,9 +7,9 @@
 get_reactions(metabolites, model)
 }
 \arguments{
-\item{metabolites}{A character vector of metabolites}
+\item{metabolites}{A character vector of metabolites.}
 
-\item{model}{A object of class \code{\link[sybil]{modelorg}}}
+\item{model}{A object of class \code{\link[sybil]{modelorg}}.}
 }
 \description{
 This function returns the stoichiometric matrix of all the reactions containing the specified metabolite(s)

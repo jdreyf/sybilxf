@@ -4,7 +4,7 @@
 \alias{sample_seahorse}
 \title{Sample from the seahorse data}
 \usage{
-sample_seahorse(x, sample.nm, nsamples = 150, nrep = 3)
+sample_seahorse(x, sample.nm, nsamples = 150, nrep = 1)
 }
 \arguments{
 \item{x}{A data.frame}

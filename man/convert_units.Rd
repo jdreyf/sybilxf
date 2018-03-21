@@ -20,6 +20,11 @@ The macromolecular weight ratio is the relationship between the initial normaliz
 mwr = 0.706, which is the estimated protein/dry_weight ratio from the biomass reaction in Recon 2. For adipocytes,
 mwr = 0.026
 }
+\references{
+Ramirez AK, Lynes MD, Shamsi F, Xue R, Tseng YH, Kahn CR, Kasif S, Dreyfuss JM. Integrating Extracellular 
+Flux Measurements and Genome-Scale Modeling Reveals Differences between Brown and White Adipocytes. Cell Rep 2017 
+Dec; 21(11): 3040-3048.
+}
 \author{
 Alfred Ramirez
 }

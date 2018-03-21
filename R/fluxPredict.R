@@ -1,17 +1,20 @@
-#'@title Make predictions from seahorse data by sampling and minimizing total flux
-#'@author Alfred Ramirez, Jonathan Dreyfuss
-#'@description This function integrates the sampled seahorse measurements as constraints into the specified model, 
-#'optionally maximizes an objective reaction, minimizes total flux for each sample, and returns a matrix 
-#'of reactions-by-samples where the entries are predicted fluxes.
-#'@param model An object of class \code{\link[sybil]{modelorg}}
-#'@param seahorse_data A data.frame returned by \code{\link{map_seahorse}}
-#'@param biomass_est Estimated biomass flux. Default = 0.
-#'@param alg Either "fba" (default) to optimize a reaction or "mtf" to only minimize total flux (and not do fba).
-#'@param obj_rxn Reaction in \code{model} to optimize if \code{alg="fba"}. Default \code{NULL} optimizes ATP demand reaction.
-#'@param model.nm The metabolic model name. One of "2.1A", "2.1x", or "2.2" (default).
-#'@param solver The solver to use; "gurobi" (default) or "glpk".
-#'@details For parallel computing, a parallel backend must be registered. See \code{\link[foreach]{foreach}} for details.
-#'@export
+#' @title Make predictions from seahorse data by sampling and minimizing total flux
+#' @author Alfred Ramirez, Jonathan Dreyfuss
+#' @description This function integrates the sampled seahorse measurements as constraints into the specified model, 
+#' optionally maximizes an objective reaction, minimizes total flux for each sample, and returns a matrix 
+#' of reactions-by-samples where the entries are predicted fluxes.
+#' @param model An object of class \code{\link[sybil]{modelorg}}.
+#' @param seahorse_data A data.frame returned by \code{\link{map_seahorse}}
+#' @param biomass_est Estimated biomass flux. Default = 0.
+#' @param alg Either "fba" (default) to optimize a reaction or "mtf" to only minimize total flux (and not do fba).
+#' @param obj_rxn Reaction in \code{model} to optimize if \code{alg="fba"}. Default \code{NULL} optimizes ATP demand reaction.
+#' @param model.nm The metabolic model name. One of "2.1A", "2.1x", or "2.2".
+#' @param solver The solver to use; "gurobi" (default) or "glpk".
+#' @details For parallel computing, a parallel backend must be registered. See \code{\link[foreach]{foreach}} for details.
+#' @references Ramirez AK, Lynes MD, Shamsi F, Xue R, Tseng YH, Kahn CR, Kasif S, Dreyfuss JM. Integrating Extracellular 
+#' Flux Measurements and Genome-Scale Modeling Reveals Differences between Brown and White Adipocytes. Cell Rep 2017 
+#' Dec; 21(11): 3040-3048.
+#' @export
 
 fluxPredict <-function(model, seahorse_data, biomass_est=0, alg=c("mtf", "fba"), low.wt.rxns=NULL,
                        obj_rxn=NULL, model.nm="2.1A", solver=c("gurobi", "glpk")){

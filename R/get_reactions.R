@@ -1,8 +1,8 @@
 #'@title Get all the reactions that contain a specified metabolite
 #'@author Alfred Ramirez
 #'@description This function returns the stoichiometric matrix of all the reactions containing the specified metabolite(s)
-#'@param metabolites A character vector of metabolites
-#'@param model A object of class \code{\link[sybil]{modelorg}}
+#'@param metabolites A character vector of metabolites.
+#'@param model A object of class \code{\link[sybil]{modelorg}}.
 
 get_reactions <- function(metabolites, model){
   s_mat <- S(model)

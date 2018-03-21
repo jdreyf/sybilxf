@@ -9,7 +9,7 @@ fluxPredict(model, seahorse_data, biomass_est = 0, alg = c("mtf", "fba"),
   solver = c("gurobi", "glpk"))
 }
 \arguments{
-\item{model}{An object of class \code{\link[sybil]{modelorg}}}
+\item{model}{An object of class \code{\link[sybil]{modelorg}}.}
 
 \item{seahorse_data}{A data.frame returned by \code{\link{map_seahorse}}}
 
@@ -19,7 +19,7 @@ fluxPredict(model, seahorse_data, biomass_est = 0, alg = c("mtf", "fba"),
 
 \item{obj_rxn}{Reaction in \code{model} to optimize if \code{alg="fba"}. Default \code{NULL} optimizes ATP demand reaction.}
 
-\item{model.nm}{The metabolic model name. One of "2.1A", "2.1x", or "2.2" (default).}
+\item{model.nm}{The metabolic model name. One of "2.1A", "2.1x", or "2.2".}
 
 \item{solver}{The solver to use; "gurobi" (default) or "glpk".}
 }
@@ -30,6 +30,11 @@ of reactions-by-samples where the entries are predicted fluxes.
 }
 \details{
 For parallel computing, a parallel backend must be registered. See \code{\link[foreach]{foreach}} for details.
+}
+\references{
+Ramirez AK, Lynes MD, Shamsi F, Xue R, Tseng YH, Kahn CR, Kasif S, Dreyfuss JM. Integrating Extracellular 
+Flux Measurements and Genome-Scale Modeling Reveals Differences between Brown and White Adipocytes. Cell Rep 2017 
+Dec; 21(11): 3040-3048.
 }
 \author{
 Alfred Ramirez, Jonathan Dreyfuss

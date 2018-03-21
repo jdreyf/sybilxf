@@ -8,7 +8,7 @@
 #'@param nrep The number of replicates, used to calculate standard error
 #'@export
 
-sample_seahorse <- function(x, sample.nm, nsamples=150, nrep=3){
+sample_seahorse <- function(x, sample.nm, nsamples=150, nrep=1){
   if (!(sample.nm %in% rownames(x))){
     stop(paste0("The sample.nm '", sample.nm, "' must be in the rownames of x"))
   }

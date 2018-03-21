@@ -12,6 +12,11 @@ fluxvar_rewrite(x)
 \description{
 This function rewrites an object of \code{\link[sybil]{optsol}} into a matrix
 }
+\references{
+Ramirez AK, Lynes MD, Shamsi F, Xue R, Tseng YH, Kahn CR, Kasif S, Dreyfuss JM. Integrating Extracellular 
+Flux Measurements and Genome-Scale Modeling Reveals Differences between Brown and White Adipocytes. Cell Rep 2017 
+Dec; 21(11): 3040-3048.
+}
 \author{
 Alfred Ramirez
 }
